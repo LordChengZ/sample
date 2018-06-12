@@ -117,5 +117,26 @@ class UsersController extends Controller
         return redirect()->route('users.show', [$user]);
     }
 
+    public function followings(User $user)
+    {
+    	$users = $user->followings()->paginate(30);
+    	$title = '关注的人';
+    	return view('users.show_follow', compact('users', 'title'));
+    }
+
+    public function followers(User $user)
+    {
+    	$users = $user->followers()->paginate(30);
+    	$title = '粉丝';
+    	return view('users.show_follow', compact('users', 'title'));
+    }
+
+    public function feed()
+    {
+    	$user_ids = Auth::user()->followings->pluck('id')->toArray();
+    	array_push($user_ids, Auth::user()->id);
+    	return Status::whereIn('user_id', $user_ids)->with('user')->orderBy('created_at', 'desc');
+    }
+
 
 }
